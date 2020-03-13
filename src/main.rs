@@ -37,12 +37,15 @@ async fn index() -> impl Responder{
 async fn main() -> std::io::Result<()> {
     let mut listenfd = ListenFd::from_env();
     let mut server =
-
+// web::scope("/app").route("/index.html", web::get().to(index)),
+    //App::new().route("/", web::get().to(|| HttpResponse::Ok()))
         HttpServer::new(|| {
             App::new()
-                .service(index)
-                .service(handlers::products::index)
-                .service(handlers::products::create)
+                .service(
+                    web::resource("/products")
+                        .route(web::get().to(handlers::products::index))
+                        .route(web::post().to(handlers::products::create))
+                )
 
         });
 
@@ -50,7 +53,7 @@ async fn main() -> std::io::Result<()> {
         server.listen(l)?
     } else {
         println!("Started http server: {}", IP);
-        server.bind(IP)?
+        server.bind(&IP)?
     };
 
     server.run().await
