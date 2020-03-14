@@ -41,3 +41,10 @@ pub async fn destroy(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
             HttpResponse::InternalServerError().json(e.to_string())
         })
 }
+pub async fn update(id: web::Path<i32>,new_product: web::Json<NewProduct>)-> Result<HttpResponse, HttpResponse>{
+    Product::update(&id, &new_product)
+        .map(|_| HttpResponse::Ok().json(()))
+        .map_err(|e| {
+            HttpResponse::InternalServerError().json(e.to_string())
+        })
+}

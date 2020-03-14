@@ -17,12 +17,12 @@ pub struct Product {
     // will be None when the db value is null
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize,AsChangeset)]
 #[table_name = "products"]
 pub struct NewProduct {
-    pub name: String,
-    pub stock: f64,
-    pub price: Option<i32>,
+    pub name: Option<String>,
+    pub stock: Option<f64>,
+    pub price: Option<i32>
 }
 
 impl NewProduct {
@@ -75,6 +75,13 @@ impl Product {
     pub fn destroy(i:&i32)-> Result<(),diesel::result::Error>{
         let connection = establish_connection();
         diesel::delete(products.find(i)).execute(&connection)?;
+        Ok(())
+    }
+    pub fn update(i:&i32,new_product:&NewProduct)->Result<(), diesel::result::Error>{
+        let connection = establish_connection();
+        diesel::update(products.find(i))
+        .set(new_product)
+        .execute(&connection)?;
         Ok(())
     }
 }
