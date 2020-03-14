@@ -1,16 +1,10 @@
-use actix_web::{Responder, HttpResponse};
+use actix_web::{Responder, HttpResponse, web, Result};
 use crate::models::product::{ProductList, Product};
 use crate::models::product::NewProduct;
-use actix_web::web;
-use actix_web::post;
-
-use actix_web::get;
-
 
 pub async fn index() -> impl Responder {
     ProductList::list()
 }
-
 
 
 pub async fn create(new_product: web::Json<NewProduct>) -> Result<HttpResponse, HttpResponse> {
@@ -24,4 +18,18 @@ pub async fn create(new_product: web::Json<NewProduct>) -> Result<HttpResponse, 
         .map_err(|e| {
             HttpResponse::InternalServerError().json(e.to_string())
         })
+}
+
+
+pub async fn show(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
+    println!("banzai");
+    print_type_of(&id);
+    Product::find(&id)
+        .map(|product| HttpResponse::Ok().json(product))
+        .map_err(|e| {
+            HttpResponse::InternalServerError().json(e.to_string())
+        })
+}
+fn print_type_of<T>(_: &T) {
+    println!("--- {}", std::any::type_name::<T>())
 }

@@ -1,5 +1,4 @@
 use actix_web::{web, App, Responder, HttpServer, HttpResponse};
-use actix_web::http::StatusCode;
 // autoreloading
 use listenfd::ListenFd;
 
@@ -24,12 +23,13 @@ extern crate futures;
 
 
 // systemfd --no-pid -s http::3000 -- cargo watch -x run
-const IP: &str = "127.0.0.1:3000";
+const IP: &str = "127.0.0.1:3001";
 
 
 use actix_web::get;
+
 #[get("/index")]
-async fn index() -> impl Responder{
+async fn index() -> impl Responder {
     HttpResponse::Ok().body("HelllOOooooOOOOOoooOO")
 }
 
@@ -37,14 +37,17 @@ async fn index() -> impl Responder{
 async fn main() -> std::io::Result<()> {
     let mut listenfd = ListenFd::from_env();
     let mut server =
-// web::scope("/app").route("/index.html", web::get().to(index)),
-    //App::new().route("/", web::get().to(|| HttpResponse::Ok()))
         HttpServer::new(|| {
             App::new()
                 .service(
                     web::resource("/products")
                         .route(web::get().to(handlers::products::index))
                         .route(web::post().to(handlers::products::create))
+                )
+
+                .service(
+                    web::resource("/products/{id}")
+                        .route(web::get().to(handlers::products::show))
                 )
 
         });
