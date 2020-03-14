@@ -72,4 +72,9 @@ impl Product {
         let connection = establish_connection();
         products.find(i).first(&connection)
     }
+    pub fn destroy(i:&i32)-> Result<(),diesel::result::Error>{
+        let connection = establish_connection();
+        diesel::delete(products.find(i)).execute(&connection)?;
+        Ok(())
+    }
 }

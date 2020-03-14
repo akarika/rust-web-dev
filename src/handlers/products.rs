@@ -33,3 +33,11 @@ pub async fn show(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
 fn print_type_of<T>(_: &T) {
     println!("--- {}", std::any::type_name::<T>())
 }
+
+pub async fn destroy(id: web::Path<i32>) -> Result<HttpResponse, HttpResponse> {
+    Product::destroy(&id)
+        .map(|_| HttpResponse::Ok().json(()))
+        .map_err(|e| {
+            HttpResponse::InternalServerError().json(e.to_string())
+        })
+}

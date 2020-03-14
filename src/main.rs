@@ -48,6 +48,7 @@ async fn main() -> std::io::Result<()> {
                 .service(
                     web::resource("/products/{id}")
                         .route(web::get().to(handlers::products::show))
+                        .route(web::delete().to(handlers::products::destroy))
                 )
 
         });
