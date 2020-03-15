@@ -1,6 +1,7 @@
 use actix_web::{web, App, Responder, HttpServer, HttpResponse};
 // autoreloading
 use listenfd::ListenFd;
+use crate::db_connection::establish_connection;
 
 pub mod handlers; // This goes to the top to load the next handlers module
 
@@ -23,15 +24,8 @@ extern crate futures;
 
 
 // systemfd --no-pid -s http::3000 -- cargo watch -x run
-const IP: &str = "127.0.0.1:3001";
+const IP: &str = "127.0.0.1:3000";
 
-
-use actix_web::get;
-
-#[get("/index")]
-async fn index() -> impl Responder {
-    HttpResponse::Ok().body("HelllOOooooOOOOOoooOO")
-}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -39,6 +33,7 @@ async fn main() -> std::io::Result<()> {
     let mut server =
         HttpServer::new(|| {
             App::new()
+                .data(establish_connection())
                 .service(
                     web::resource("/products")
                         .route(web::get().to(handlers::products::index))

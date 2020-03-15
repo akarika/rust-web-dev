@@ -1,11 +1,11 @@
 use crate::schema::products;
-use diesel::RunQueryDsl;
+use diesel::{RunQueryDsl, PgConnection};
 use diesel::QueryDsl;
 use crate::schema::products::dsl::*;
-use crate::db_connection::establish_connection;
 use actix_web::{Responder, HttpRequest, Error, HttpResponse};
 
 use futures::future::{ready, Ready};
+use crate::db_connection::PgPooledConnection;
 
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct Product {
@@ -30,11 +30,10 @@ impl NewProduct {
     // just for fun remove the & after writing the handler and
     // take a look at the error, to make it work we would need to use into_inner (https://actix.rs/api/actix-web/stable/actix_web/struct.Json.html#method.into_inner)
     // which points to the inner value of the Json request.
-    pub fn create(&self) -> Result<Product, diesel::result::Error> {
-        let connection = establish_connection();
+    pub fn create(&self,connection: &PgConnection) -> Result<Product, diesel::result::Error> {
         diesel::insert_into(products::table)
             .values(self)
-            .get_result(&connection)
+            .get_result(connection)
     }
 }
 
@@ -43,11 +42,10 @@ impl NewProduct {
 pub struct ProductList(pub Vec<Product>);
 
 impl ProductList {
-    pub fn list() -> Self {
-        let connection = establish_connection();
+    pub fn list(connection: &PgPooledConnection) -> Self {
         let result = products
             .limit(10)
-            .load::<Product>(&connection)
+            .load::<Product>(connection)
             .expect("Error loading products");
 
         ProductList(result)
@@ -68,20 +66,17 @@ impl Responder for ProductList {
 }
 
 impl Product {
-    pub fn find(i: &i32) -> Result<Product, diesel::result::Error> {
-        let connection = establish_connection();
-        products.find(i).first(&connection)
+    pub fn find(i: &i32,connection: &PgConnection) -> Result<Product, diesel::result::Error> {
+        products.find(i).first(connection)
     }
-    pub fn destroy(i:&i32)-> Result<(),diesel::result::Error>{
-        let connection = establish_connection();
-        diesel::delete(products.find(i)).execute(&connection)?;
+    pub fn destroy(i:&i32,connection: &PgConnection)-> Result<(),diesel::result::Error>{
+        diesel::delete(products.find(i)).execute(connection)?;
         Ok(())
     }
-    pub fn update(i:&i32,new_product:&NewProduct)->Result<(), diesel::result::Error>{
-        let connection = establish_connection();
+    pub fn update(i:&i32,new_product:&NewProduct,connection: &PgConnection)->Result<(), diesel::result::Error>{
         diesel::update(products.find(i))
         .set(new_product)
-        .execute(&connection)?;
+        .execute(connection)?;
         Ok(())
     }
 }
