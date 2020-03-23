@@ -47,3 +47,4 @@ pub fn decode_token(token: &str) -> Result<SlimUser, HttpResponse> {
 fn get_secret<'a>() -> &'a [u8] {
     dotenv!("JWT_SECRET").as_bytes()
 }
+
