@@ -10,9 +10,13 @@ edition = "2018"
 actix-web = "2.0"
 actix-rt = "1.0"
 listenfd = "0.3"
-diesel = { version = "1.4.3", features = ["postgres","r2d2"] }
+diesel = { version = "1.4.3", features = ["postgres","r2d2","chrono"] }
 dotenv = "0.15.0"
 serde_json = "1.0.48"
 serde = "1.0.104"
 serde_derive = "1.0.104"
 futures = "0.3.4"
+jsonwebtoken = "7.1.0"
+bcrypt = "0.6.2"
+chrono = { version = "0.4.6", features = ["serde"] }
+csrf-token ={path= "csrf-token"}

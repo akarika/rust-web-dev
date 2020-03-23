@@ -4,7 +4,7 @@ use listenfd::ListenFd;
 use crate::db_connection::establish_connection;
 
 pub mod handlers; // This goes to the top to load the next handlers module
-
+pub mod utils;
 extern crate serde;
 extern crate serde_json;
 #[macro_use]
@@ -13,7 +13,7 @@ extern crate serde_derive;
 pub mod schema;
 pub mod models;
 pub mod db_connection;
-
+pub mod errors;
 
 #[macro_use]
 extern crate diesel;
